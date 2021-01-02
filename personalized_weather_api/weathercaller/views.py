@@ -5,10 +5,11 @@ import requests
 from datetime import date
 
 def retrieveWeather(req):
+''' Gets weather based on ip address of request and stores it in database '''
     reqtoken = req.GET.get('token')
     if not reqtoken:
         return JsonResponse({'Error':'Token not provided'},status=400)
-    data = requests.get("http://api.weatherapi.com/v1/current.json?key=8b1a4a9509a64577a89155041210101&q={}".format(req.GET.get('ip'))) #Use req.META['REMOTE_ADDR']
+    data = requests.get("http://api.weatherapi.com/v1/current.json?key=8b1a4a9509a64577a89155041210101&q={}".format(req.GET.get('ip'))) #Use req.META['REMOTE_ADDR'] in proper production enviroment
     data = json.loads(data.text) 
     weather = data['current']
     if Day.objects.filter(token=reqtoken,date=str(date.today())):
@@ -21,6 +22,7 @@ def retrieveWeather(req):
     return JsonResponse({"date":str(date.today()),"weather":weather})
 
 def retrieveData(req):
+''' Retrieves date and weather data stored in database according to token provided '''
     reqtoken = req.GET.get('token')
     if not reqtoken:
         return JsonResponse({'Error':'Token not provided'},status=400)
